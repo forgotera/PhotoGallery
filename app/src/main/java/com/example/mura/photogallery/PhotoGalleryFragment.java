@@ -27,7 +27,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PhotoGalleryFragment extends Fragment {
+public class PhotoGalleryFragment extends VisibleFragment {
     private RecyclerView mRecyclerView;
     private List<GalleryItem> mItems = new ArrayList<>();
 
@@ -178,18 +178,30 @@ public class PhotoGalleryFragment extends Fragment {
         }
     }
 
-    private class PhotoHolder extends RecyclerView.ViewHolder{
+    private class PhotoHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         private ImageView mItemImageView;
+        private GalleryItem mGalleryItem;
 
         public PhotoHolder(View itemView) {
             super(itemView);
 
             mItemImageView = (ImageView) itemView.findViewById(R.id.item_image_view);
+            itemView.setOnClickListener(this);
         }
 
         public void bindDrawable(Drawable drawable){
 
             mItemImageView.setImageDrawable(drawable);
+        }
+
+        public void bindGalleryItem(GalleryItem galleryItem){
+            mGalleryItem = galleryItem;
+        }
+
+        @Override
+        public void onClick(View v){
+            Intent i = PhotoPageActivity.newIntent(getActivity(),mGalleryItem.getPhotoPageUrl());
+            startActivity(i);
         }
     }
 
@@ -212,6 +224,7 @@ public class PhotoGalleryFragment extends Fragment {
         @Override
         public void onBindViewHolder(@NonNull PhotoHolder holder, int position) {
             GalleryItem galleryItem = mGalleryItems.get(position);
+            holder.bindGalleryItem(galleryItem);
             Drawable placeholder = getResources().getDrawable(R.drawable.brian_up_close);
             holder.bindDrawable(placeholder);
             mThumbmailDownloader.queueThumbnail(holder,galleryItem.getmUrl());
